@@ -133,17 +133,14 @@ panorama.prototype = {
         function appendOutlineToNode(n){}
         function appendTextToNode(n){}
         function appendImageToNode(n){}
-        function updateNodes() {
+        function updateNodes(nodeData) {
             node = svgNodes.selectAll('.node')
-            .data(nodes, function (d) {
-                return d.id;
-            });
+            .data(nodeData);
             console.log(node);
             var nodeEnter = appendNodeToGraph();
-            node = nodeEnter.merge(node);
         }
-
         appendGraph(d3.select(container));
+        updateNodes(nodeData);
     },
 
 // 事件方法
