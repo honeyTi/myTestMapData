@@ -15,14 +15,9 @@ panorama.prototype = {
         const container = data.container,
               color = data.color,
               tier = data.tier,
-              nodeRadius = data.nodeRadius;
-        let mapData = null;
-        // 数据获取与判断
-        if (type === "") {
-            mapData = data.data;
-        } else {
-            
-        }
+              nodeRadius = data.nodeRadius,
+              nodes = data.data.nodes,
+              nodeRelationships = data.data.nodeRelationships;
         // 用到的变量
         let svg, svgScale, svgTranslate, svgRelationships, svgNodes, node;
         
@@ -59,10 +54,9 @@ panorama.prototype = {
                 .attr('class', 'nodes');
         }
         function appendNodeToGraph() {
-            alert(23857983468934689);
             var n = appendNode();
 
-            appendRingToNode(n);
+           // appendRingToNode(n);
             
             appendOutlineToNode(n);
 
@@ -77,64 +71,29 @@ panorama.prototype = {
             return n;
         }
         function appendNode() {
-            return node.enter()
-                .append('g')
-                .attr('class', function (d) {
-                    var highlight, i,
-                        classes = 'node',
-                        label = d.labels[0];
-
-                    if (icon(d)) {
-                        classes += ' node-icon';
-                    }
-
-                    if (image(d)) {
-                        classes += ' node-image';
-                    }
-
-                    if (data.highlight) {
-                        for (i = 0; i < data.highlight.length; i++) {
-                            highlight = data.highlight[i];
-
-                            if (d.labels[0] === highlight.class && d.properties[highlight.property] === highlight.value) {
-                                classes += ' node-highlighted';
-                                break;
-                            }
-                        }
-                    }
-                    return classes;
+            return svgNodes.selectAll('g')
+                        .data(nodes)
+                        .enter()
+                        .append('g')
+                        .attr('class','node')
+                        .append('circle')
+                        .attr('fill','#e4393c')
+                        .attr('r', '20')
+                        .append('text');
+        }
+        function appendOutlineToNode(){
+            return svgNodes.selectAll('.node') 
+                .append('circle')
+                .attr('class', 'ring')
+                .attr('r', function (d) {
+                    return 25;
                 })
-                // .on('click', function (d) {
-                //     d.fx = d.fy = null;
-                //     var nowRadius = options.radius.baseRadius / Math.pow(options.radius.multiple, (d.level - 1));
-                //     //如果用户自己定义了单击事件，则调用用户定义的事件
-                //     if (typeof options.onNodeClick === 'function') {
-                //         options.onNodeClick(d);
-                //     }
-                //     //否则执行默认的clickAction方法，显示功能按钮
-                //     else return clickAction(this, nowRadius); //设置默认单击事件
-                // })
-                .call(d3.drag()
-                    .on('start', dragStarted)
-                    .on('drag', dragged)
-                    .on('end', dragEnded));
+                .append('title').text("ring");
         }
-
-        function appendRingToNode(n){
-            return node.append('circle')
-            .attr('class', 'ring')
-            .attr('r', function (d) {
-                return data.radius.baseRadius / Math.pow(data.radius.multiple, (d.level - 1)) * 1.16;
-            })
-            .append('title').text(function (d) {
-                return toString(d);
-            });
-        }
-        function appendOutlineToNode(n){}
         function appendTextToNode(n){}
         function appendImageToNode(n){}
         appendGraph(d3.select(container));
-        
+        appendNodeToGraph();
     },
 
 // 事件方法
