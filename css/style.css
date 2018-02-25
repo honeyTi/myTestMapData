@@ -1,0 +1,26 @@
+.node.node-highlighted .ring {
+    -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=50)';
+    filter: alpha(opacity=50);
+    opacity: .5;
+    stroke: #888;
+    stroke-width: 12px;
+}
+.node .ring {
+fill: none;
+-ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=0)';
+filter: alpha(opacity=0);
+opacity: 0;
+stroke: #6ac6ff;
+stroke-width: 8px;
+}
+.node .text.icon {
+font-family: FontAwesome;
+}
+
+.node.selected .ring,
+.node:hover .ring {
+-ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=30)';
+filter: alpha(opacity=30);
+opacity: .3;
+}
+  

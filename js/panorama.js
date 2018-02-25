@@ -19,7 +19,7 @@ panorama.prototype = {
               nodes = data.data.nodes,
               nodeRelationships = data.data.nodeRelationships;
         // 用到的变量
-        let svg, svgScale, svgTranslate, svgRelationships, svgNodes;
+        let svg, svgScale, svgTranslate, svgRelationships, svgNodes, node;
         
         // 页面处理，添加d3元素，增加内容
         function appendGraph(container) {
@@ -53,8 +53,23 @@ panorama.prototype = {
             svgNodes = svg.append('g')
                 .attr('class', 'nodes');
         }
+        function appendNodeToGraph() {
+            var n = appendNode();
 
-        // 页面添加节点
+           // appendRingToNode(n);
+            
+            appendOutlineToNode(n);
+
+            if (data.icons) {
+                appendTextToNode(n);
+            }
+
+            if (data.images) {
+                appendImageToNode(n);
+            }
+
+            return n;
+        }
         function appendNode() {
             return svgNodes.selectAll('g')
                         .data(nodes)
@@ -70,8 +85,19 @@ panorama.prototype = {
                         })
                         .attr('dy','1em')
         }
+        function appendOutlineToNode(){
+            return svgNodes.selectAll('.node') 
+                .append('circle')
+                .attr('class', 'ring')
+                .attr('r', function (d) {
+                    return 25;
+                })
+                .append('title').text("ring");
+        }
+        function appendTextToNode(n){}
+        function appendImageToNode(n){}
         appendGraph(d3.select(container));
-        appendNode();
+        appendNodeToGraph();
     },
 
 // 事件方法
