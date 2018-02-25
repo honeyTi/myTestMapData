@@ -24,7 +24,14 @@
             color: '',
             tier: '',
             nodeRadius: 25,
-            data:''
+            data: {
+                nodes:[
+                    {id: '1', tier: '1', color: '', properties:[]},
+                    {id: '2', tier: '2', color: '', properties:[]},
+                    {id: '3', tier: '3', color: '', properties:[]}
+                ],
+                nodeRelationships: []
+            }
         };
         panorama(data,'neo4jData');
     </script>
