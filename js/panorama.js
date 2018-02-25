@@ -18,7 +18,7 @@ panorama.prototype = {
               nodeRadius = data.nodeRadius;
         let mapData = null;
         // 数据获取与判断
-        if (type === "neo4jData") {
+        if (type === "") {
             mapData = data.data;
         } else {
             
@@ -133,14 +133,8 @@ panorama.prototype = {
         function appendOutlineToNode(n){}
         function appendTextToNode(n){}
         function appendImageToNode(n){}
-        function updateNodes(nodeData) {
-            node = svgNodes.selectAll('.node')
-            .data(nodeData);
-            console.log(node);
-            var nodeEnter = appendNodeToGraph();
-        }
         appendGraph(d3.select(container));
-        updateNodes(nodeData);
+        
     },
 
 // 事件方法
