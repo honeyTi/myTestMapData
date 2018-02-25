@@ -15,14 +15,9 @@ panorama.prototype = {
         const container = data.container,
               color = data.color,
               tier = data.tier,
-              nodeRadius = data.nodeRadius;
-        let mapData = null;
-        // 数据获取与判断
-        if (type === "") {
-            mapData = data.data;
-        } else {
-            
-        }
+              nodeRadius = data.nodeRadius,
+              nodes = data.data.nodes,
+              nodeRelationships = data.data.nodeRelationships;
         // 用到的变量
         let svg, svgScale, svgTranslate, svgRelationships, svgNodes;
         
@@ -61,9 +56,18 @@ panorama.prototype = {
 
         // 页面添加节点
         function appendNode() {
-            return svgNodes
+            return svgNodes.selectAll('g')
+                        .data(nodes)
+                        .enter()
+                        .append('g')
+                        .attr('class','node')
+                        .append('circle')
+                        .attr('fill','#e4393c')
+                        .attr('r', '20')
+                        .append('text');
         }
         appendGraph(d3.select(container));
+        appendNode();
     },
 
 // 事件方法
