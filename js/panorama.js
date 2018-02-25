@@ -64,7 +64,11 @@ panorama.prototype = {
                         .append('circle')
                         .attr('fill','#e4393c')
                         .attr('r', '20')
-                        .append('text');
+                        .append('text')
+                        .text(function (d) {
+                            return d.id
+                        })
+                        .attr('dy','1em')
         }
         appendGraph(d3.select(container));
         appendNode();
