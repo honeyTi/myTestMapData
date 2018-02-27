@@ -47,10 +47,13 @@ panorama.prototype = {
         // 颜色处理函数
         function getColor(nodes) {
             let node_color_index = 0;
-            let node_color = new Array("#ff461f", "#fff143", "#75664d", "#cca4e3", "#8d4bbb", "#4b5cc4", "#00e500", "#274a78", "#544a47",
-            "#ffb61e", "#0eb83a");
-            let color = data.color;
-            //let first_label = "man";
+            let node_color = new Array();
+            let color = null;
+            if (option.color.length > 0) {
+                color = option.color;
+            } else {
+                color = ["#ff461f", "#fff143", "#75664d", "#cca4e3", "#8d4bbb", "#4b5cc4", "#00e500", "#274a78", "#544a47", "#ffb61e", "#0eb83a"];
+            }
             for (let node_index = 0; node_index < nodes.length; ++node_index) {
                 let first_label = nodes[node_index]["data"]["labels"][0];
                 if (!node_color[first_label]) {
@@ -72,7 +75,7 @@ panorama.prototype = {
             );
         };
 
-        let svg = d3.select("body").append("svg") //在body标签中添加 svg 标签
+        let svg = d3.select(option.container).append("svg") //在body标签中添加 svg 标签
             .attr("width", width) // 设定svg 的宽度
             .attr("height", height) //设定 svg 的高度
             .call(zoom) //允许 svg 的拖动;
