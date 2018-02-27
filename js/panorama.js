@@ -162,6 +162,9 @@ panorama.prototype = {
                             break;
                         case "PROPERTY":
                             // 增加属性展示功能
+                            console.log('-------------');
+                            console.log(node_info);
+                            console.log('-------------');
                             ACTION = '';
                             break;
                         case "EXTENDS":
@@ -305,6 +308,7 @@ panorama.prototype = {
         });
 
         // 构造视图函数
+        let node_info = null;
         function update_view(node, link) {
 
 
@@ -458,6 +462,8 @@ panorama.prototype = {
                         let out_node = svg.select(curr_id).classed("pie_display", true);
                     })
                     .on("click", function (d, i) { // 单击 清除所有的显示状态的三瓣式圆环，只显示本节点的 三瓣式 圆环
+                        console.log('添加事件');
+                        node_info = d;
                         let pie_id = ".ingroup_pie_" + d.id;
                         svg.selectAll("use").classed("pie_display", true);
                         let pie_node = svg.select(pie_id).classed("pie_display", false);
@@ -489,6 +495,7 @@ panorama.prototype = {
                         let out_node = svg.select(curr_id).classed("pie_display", true);
                     })
                     .on("click", function (d, i) {
+                        node_info = d;
                         let pie_id = ".ingroup_pie_" + d.id;
                         svg.selectAll("use").classed("pie_display", true);
                         let pie_node = svg.select(pie_id).classed("pie_display", false);
