@@ -1,52 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
     <link rel="stylesheet" href="css/style.css">
-    <script src="js/d3.min.js"></script>
+    <script src="js/d3.v3.min.js"></script>
     <script src="js/panorama.js"></script>
     <style>
-        html, body {
+        html,
+        body {
             width: 100%;
             height: 100%;
         }
+
         #main {
             width: 100%;
             height: 100%;
         }
     </style>
 </head>
+
 <body>
     <div id="main"></div>
     <script>
-        var NODES_DATA = [
-            {"id": "李雷", "data": {"labels": ["man", "person"], "property": {"age": 21, "name": "李雷"}}},
-            {"id": "丹尼", "data": {"labels": ["children", "person"], "property": {"age": 21, "name": "丹尼"}}},
-            {"id": "韩梅梅", "data": {"labels": ["woman", "person"], "property": {"age": 20, "name": "韩梅梅", "from": "beijing"}}},
-            {"id": "大刘", "data": {"labels": ["person"], "property": {"age": 20, "name": "大刘", "from": "beijing"}}},
-            {"id": "张兰", "data": {"labels": ["person"], "property": {"age": 20, "name": "张兰", "from": "beijing"}}}, 
-            {"id": "小红", "data": {"labels": ["person"], "property": {"age": 20, "name": "小红", "from": "beijing"}}}
+        var dom = document.getElementById('main');
+        console.log(dom.offsetHeight);
+        console.log(dom.offsetWidth);
+        var node = [{
+                "id": "李雷",
+                "data": {
+                    "labels": ["man", "person"],
+                    "property": {
+                        "age": 21,
+                        "name": "李雷"
+                    }
+                }
+            },
+            {
+                "id": "丹尼",
+                "data": {
+                    "labels": ["children", "person"],
+                    "property": {
+                        "age": 21,
+                        "name": "丹尼"
+                    }
+                }
+            },
+            {
+                "id": "韩梅梅",
+                "data": {
+                    "labels": ["woman", "person"],
+                    "property": {
+                        "age": 20,
+                        "name": "韩梅梅",
+                        "from": "beijing"
+                    }
+                }
+            },
+            {
+                "id": "大刘",
+                "data": {
+                    "labels": ["person"],
+                    "property": {
+                        "age": 20,
+                        "name": "大刘",
+                        "from": "beijing"
+                    }
+                }
+            },
+            {
+                "id": "张兰",
+                "data": {
+                    "labels": ["person"],
+                    "property": {
+                        "age": 20,
+                        "name": "张兰",
+                        "from": "beijing"
+                    }
+                }
+            }, {
+                "id": "小红",
+                "data": {
+                    "labels": ["person"],
+                    "property": {
+                        "age": 20,
+                        "name": "小红",
+                        "from": "beijing"
+                    }
+                }
+            }
         ];
-
-    NODES_LINK = [
-        {"source": "李雷", "target": "丹尼", "labels": "fa_sun", "property": {"begin": 1991}},
-        {"source": "李雷", "target": "韩梅梅", "labels": "mo_sun", "property": {"begin": 1991}},
-        {"source": "小红", "target": "韩梅梅", "labels": "lover", "property": {"begin": 1922}},
-        {"source": "李雷", "target": "大刘", "labels": "friend", "property": {"begin": 1111}},
-        {"source": "李雷", "target": "张兰", "labels": "friend", "property": {"begin": 1111}},
-        {"source": "李雷", "target": "小红", "labels": "friend", "property": {"begin": 1111}}
-    ];
+        var link = [
+            {"source": "李雷", "target": "丹尼", "labels": "fa_sun", "property": {"begin": 1991}},
+            {"source": "韩梅梅", "target": "丹尼", "labels": "mo_sun", "property": {"begin": 1991}},
+            {"source": "李雷", "target": "韩梅梅", "labels": "lover", "property": {"begin": 1922}},
+            {"source": "大刘", "target": "韩梅梅", "labels": "friend", "property": {"begin": 1111}},
+            {"source": "大刘", "target": "张兰", "labels": "friend", "property": {"begin": 1111}},
+            {"source": "小红", "target": "张兰", "labels": "friend", "property": {"begin": 1111}}
+        ];
         var data = {
             container: '#main',
-            containerWH: [800, 800],
+            containerWH: [dom.offsetWidth, dom.offsetHeight],
             color: '',
             tier: '',
             nodeRadius: 25,
-            nodes: NODES_DATA,
-            links: NODES_LINK
+            nodes: node,
+            links: link
         };
-        panorama(data,'neo4jData');
+        panorama(data);
     </script>
 </body>
+
 </html>

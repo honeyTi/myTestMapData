@@ -38,20 +38,29 @@ panorama.prototype = {
             return links
         }
 
+        //获取 input 输入的 字符串的 像素宽度
+        function getLenPx(str, font_size) {
+            var str_leng = str.replace(/[^\x00-\xff]/gi, 'aa').length;
+            return str_leng * font_size / 2
+        }
+
         // 颜色处理函数
         function getColor(nodes) {
             let node_color_index = 0;
-            let node_color = new Array()
+            let node_color = new Array("#ff461f", "#fff143", "#75664d", "#cca4e3", "#8d4bbb", "#4b5cc4", "#00e500", "#274a78", "#544a47",
+            "#ffb61e", "#0eb83a");
             let color = data.color;
+            //let first_label = "man";
             for (let node_index = 0; node_index < nodes.length; ++node_index) {
-                first_label = nodes[node_index]["data"]["labels"][0];
+                let first_label = nodes[node_index]["data"]["labels"][0];
                 if (!node_color[first_label]) {
                     node_color[first_label] = color[node_color_index];
                     node_color_index += 1
                 }
             }
-            return node_color
+            return node_color;
         }
+        var node_color = getColor(option.node_data);
         // 缩放功能
         let zoom = d3.behavior.zoom()
             .scaleExtent([1 / 2, 20]) //缩放 比例范围
@@ -74,7 +83,7 @@ panorama.prototype = {
 
         // 引力图设定
         let force = d3.layout.force() // 布局
-            .nodes(NODES_DATA)
+            .nodes(option.node_data)
             .size([width, height]) //设定布局的范围
             .linkDistance(500) //节点之间距离
             .charge(-2500) //互斥力
@@ -105,6 +114,9 @@ panorama.prototype = {
         let database = [1, 1, 1];
         let pie = d3.layout.pie();
         let piedata = pie(database);
+        var arc = d3.svg.arc()
+            .innerRadius(30)
+            .outerRadius(60);
         let outer = defs.append("g")
             .attr("id", 'out_circle')
             .selectAll(".group")
@@ -247,6 +259,7 @@ panorama.prototype = {
 
 
             /*--------------动态调节 节点上文字的位置，使其随着节点的移动而移动----开始----------------*/
+            
             //设定text的 坐标
             text_nodes.attr("x", function (d, i) {
                 let strr = d.data.property.name;
@@ -285,16 +298,16 @@ panorama.prototype = {
 
 
             let links = [];
-            if (linkset.length > 0) {
-                if (typeof(linkset[0]["source"]) == "string") {
+            if (link.length > 0) {
+                if (typeof(link[0]["source"]) == "string") {
                     links = node2node(node, link);
-                } else if (typeof(linkset[0]["source"]) == "object") {
+                } else if (typeof(link[0]["source"]) == "object") {
                     links = link
                 }
             }
     
     
-            let links = link;
+            // let links = link;
             /* ---获取节点间连线 edge 的三个部分 update enter  exit  部分---用 path 构建- */
             let edge_line_update = svg.selectAll(".edge_line").data(links);
             let edge_line_enter = edge_line_update.enter();
@@ -313,7 +326,7 @@ panorama.prototype = {
              * 4.三瓣式圆(环)    就是单击实心圆时，在外部轮廓圆周围环绕的分成三部分的比较宽的圆环。这个其实饼形图，它不是由圆生成而是由path 生成，
              *                   并且，多个实心圆单击出现的这个三瓣式圆环，其实是对早已定义在defs中原始三瓣式圆环的 复用。  --用 path 构建
              * */
-            let groups_update = svg.selectAll(".groupstyle").data(dataset);
+            let groups_update = svg.selectAll(".groupstyle").data(option.node_data);
             let groups_enter = groups_update.enter();
             let groups_exit = groups_update.exit();
     
@@ -395,7 +408,7 @@ panorama.prototype = {
             groups.append("circle").attr("class", "outer_node");//每个组中都添加一个 圆 子元素，属性是outer_node;
     
             svg.selectAll(".outer_node") // 选择所有的外部轮廓圆，对其属性设置。
-                    .data(dataset)
+                    .data(option.node_data)
                     .attr("r", OUTER_R)
                     .attr("class", function (d, i) {
                         return "outer_node" + " ingroup_out_" + d.id + "   outer_circle_nodes"
@@ -410,7 +423,7 @@ panorama.prototype = {
             groups.append("circle").attr("class", "inner_node"); //每个组再次添加一个子元素，属性是 inner_node
     
             svg.selectAll(".inner_node")// 选择所有的内部圆，对其属性设置。
-                    .data(dataset)
+                    .data(option.node_data)
                     .attr("r", INNER_R)
                     .attr("class", function (d, i) {
                         return "inner_node" + " ingroup_inne_" + d.id + "   inner_circle_nodes"
@@ -445,7 +458,7 @@ panorama.prototype = {
             groups.append("text").attr("class", "text_nodes"); //每个节点组添加一个 文字 子元素
             let FONT_SIZE = 12;  // 节点文字的大小
             svg.selectAll(".text_nodes")
-                    .data(NODES_DATA)
+                    .data(option.node_data)
                     .attr("class", "text_nodes")
                     .attr("fill", "black")
                     .text(function (d, i) {
@@ -475,6 +488,8 @@ panorama.prototype = {
     
     
         }
+
+        update_view(option.node_data, option.node_links);
     },
     // 事件方法
     nodeClick: function () {
