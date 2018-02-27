@@ -55,7 +55,7 @@ panorama.prototype = {
                 color = ["#ff461f", "#fff143", "#75664d", "#cca4e3", "#8d4bbb", "#4b5cc4", "#00e500", "#274a78", "#544a47", "#ffb61e", "#0eb83a"];
             }
             for (let node_index = 0; node_index < nodes.length; ++node_index) {
-                let first_label = nodes[node_index]["data"]["labels"][0];
+                let first_label = nodes[node_index]["data"]["labels"];
                 if (!node_color[first_label]) {
                     node_color[first_label] = color[node_color_index];
                     node_color_index += 1
@@ -119,8 +119,8 @@ panorama.prototype = {
         let pie = d3.layout.pie();
         let piedata = pie(database);
         var arc = d3.svg.arc()
-            .innerRadius(option.nodeRadius)
-            .outerRadius(option.nodeRadius * 2);
+            .innerRadius(option.nodeRadius * 1.2 )
+            .outerRadius(option.nodeRadius * 2.2 );
         let outer = defs.append("g")
             .attr("id", 'out_circle')
             .selectAll(".group")
@@ -132,7 +132,8 @@ panorama.prototype = {
             });
         outer.append("path")
             .attr("d", function (d) {
-                return arc(d)
+                return arc(d);
+                
             })
             .attr("fill", "#bbcdc5")
             .attr("stroke", "#f0f0f4")
@@ -191,8 +192,8 @@ panorama.prototype = {
 
             /*-----限定 节点组 移动 范围开始------*/
             // 所有 节点的移动边界由此 限定
-            let g_x = 50;
-            let g_y = 50;
+            let g_x = option.nodeRadius * 2;
+            let g_y = option.nodeRadius * 2;
             three_part_pie.attr("x", function (d) {
                     if (d.x - g_x < 0) { //d.x 为节点的 x 轴坐标。如果 节点 x 轴坐标 - 某个数值 如果 < 0 ,说明，至少有一部分内容已经在显示边界之外了，
                         // 为了使全部的元素都显示在 限定范围内，所以作此限定。
@@ -420,32 +421,38 @@ panorama.prototype = {
                     .classed("pie_display", true); //该 三瓣式 圆环 默认是不显示状态。
     
             // 添加外部轮廓圆
-            let OUTER_R = 30; // 外部圆 半径 长度
+            let OUTER_R = option.nodeRadius; // 外部圆 半径 长度
             groups.append("circle").attr("class", "outer_node");//每个组中都添加一个 圆 子元素，属性是outer_node;
     
             svg.selectAll(".outer_node") // 选择所有的外部轮廓圆，对其属性设置。
                     .data(option.node_data)
-                    .attr("r", OUTER_R)
+                    .attr("r", function (d) {
+                        return OUTER_R / Math.pow(1.3, (d.data.labels - 1));
+                    })
                     .attr("class", function (d, i) {
                         return "outer_node" + " ingroup_out_" + d.id + "   outer_circle_nodes"
                     })
                     .style("stroke", "#e0f0e9")
-                    .style("stroke-width", 11)
+                    .style("stroke-width",function (d) {
+                        return OUTER_R / Math.pow(1.3, (d.data.labels - 1)) * 0.45;
+                    })
                     .style("opacity", 0.7)
                     .classed("pie_display", true);
     
             // 添加内部圆
-            let INNER_R = 25; // 内部圆 半径 长度
+            let INNER_R = option.nodeRadius; // 内部圆 半径 长度
             groups.append("circle").attr("class", "inner_node"); //每个组再次添加一个子元素，属性是 inner_node
     
             svg.selectAll(".inner_node")// 选择所有的内部圆，对其属性设置。
                     .data(option.node_data)
-                    .attr("r", INNER_R)
+                    .attr("r", function (d) {
+                        return INNER_R / Math.pow(1.3, (d.data.labels - 1));
+                    })
                     .attr("class", function (d, i) {
                         return "inner_node" + " ingroup_inne_" + d.id + "   inner_circle_nodes"
                     })
                     .attr("fill", function (d, i) {
-                        return node_color[d.data.labels[0]]
+                        return node_color[d.data.labels]
                     })
                     .attr("id", function (d, i) {
                         return d.id
