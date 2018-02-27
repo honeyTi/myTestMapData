@@ -40,7 +40,7 @@ panorama.prototype = {
 
         //获取 input 输入的 字符串的 像素宽度
         function getLenPx(str, font_size) {
-            var str_leng = str.replace(/[^\x00-\xff]/gi, 'aa').length;
+            let str_leng = str.replace(/[^\x00-\xff]/gi, 'aa').length;
             return str_leng * font_size / 2
         }
 
@@ -63,7 +63,7 @@ panorama.prototype = {
             }
             return node_color;
         }
-        var node_color = getColor(option.node_data);
+        let node_color = getColor(option.node_data);
         // 缩放功能
         let zoom = d3.behavior.zoom()
             .scaleExtent([1 / 2, 20]) //缩放 比例范围
@@ -118,40 +118,52 @@ panorama.prototype = {
         let database = [1, 1, 1];
         let pie = d3.layout.pie();
         let piedata = pie(database);
-        var arc = d3.svg.arc()
-            .innerRadius(option.nodeRadius * 1.2 )
-            .outerRadius(option.nodeRadius * 2.2 );
-        let outer = defs.append("g")
-            .attr("id", 'out_circle')
-            .selectAll(".group")
-            .data(piedata)
-            .enter()
-            .append("g")
-            .attr("class", function (d, i) {
-                return "action_" + i + " three_circle"
-            });
-        outer.append("path")
-            .attr("d", function (d) {
-                return arc(d);
-                
-            })
-            .attr("fill", "#bbcdc5")
-            .attr("stroke", "#f0f0f4")
-            .attr("stroke-width", 2);
-        outer.append("text")
-            .attr("transform", function (d, i) {
-                return "translate(" + arc.centroid(d) + ")";
-            })
-            .attr("text-anchor", "middle")
-            .text(function (d, i) {
-                let zi = new Array()
-                zi[0] = "释放";
-                zi[1] = "扩展";
-                zi[2] = "属性";
-                return zi[i]
-            })
-            .attr("font-size", 10);
-        // 三个按钮功能
+
+        function threeMenu(data) {
+            let maxLabel = data[0].data.labels;
+            for (let i = 0; i < data.length; i++) {
+                maxLabel = maxLabel > data[i].data.labels ? maxLabel : data[i].data.labels;
+            }
+            for (let j = 0; j <= maxLabel; j++) {
+                let arc = d3.svg.arc()
+                    .innerRadius(option.nodeRadius * 1.2 / Math.pow(1.3, (j - 1)))
+                    .outerRadius(option.nodeRadius * 2.2 / Math.pow(1.3, (j - 1)));
+                let outer = defs.append("g")
+                    .attr("id", 'out_circle_'+ j)
+                    .selectAll(".group")
+                    .data(piedata)
+                    .enter()
+                    .append("g")
+                    .attr("class", function (d, i) {
+                        return "action_" + i + " three_circle"
+                    });
+                outer.append("path")
+                    .attr("d", function (d) {
+                        return arc(d);
+                    })
+                    .attr('cursor', 'pointer')
+                    .attr("fill", "#bbcdc5")
+                    .attr("stroke", "#f0f0f4")
+                    .attr("stroke-width", 2);
+                outer.append("text")
+                    .attr("transform", function (d, i) {
+                        return "translate(" + arc.centroid(d) + ")";
+                    })
+                    .attr("text-anchor", "middle")
+                    .attr('cursor', 'pointer')
+                    .text(function (d, i) {
+                        let zi = new Array()
+                        zi[0] = "释放";
+                        zi[1] = "扩展";
+                        zi[2] = "属性";
+                        return zi[i]
+                    })
+                    .attr("font-size", 10);
+
+            }
+        }
+        threeMenu(option.node_data);
+    
         force.on('tick', function () {
 
             svg.selectAll(".groupstyle").on("click", function (d, i) {
@@ -274,7 +286,7 @@ panorama.prototype = {
 
 
             /*--------------动态调节 节点上文字的位置，使其随着节点的移动而移动----开始----------------*/
-            
+
             //设定text的 坐标
             text_nodes.attr("x", function (d, i) {
                 let strr = d.data.property.name;
@@ -310,30 +322,31 @@ panorama.prototype = {
 
         // 构造视图函数
         let node_info = null;
+
         function update_view(node, link) {
 
 
             let links = [];
             if (link.length > 0) {
-                if (typeof(link[0]["source"]) == "string") {
+                if (typeof (link[0]["source"]) == "string") {
                     links = node2node(node, link);
-                } else if (typeof(link[0]["source"]) == "object") {
+                } else if (typeof (link[0]["source"]) == "object") {
                     links = link
                 }
             }
-    
-    
+
+
             // let links = link;
             /* ---获取节点间连线 edge 的三个部分 update enter  exit  部分---用 path 构建- */
             let edge_line_update = svg.selectAll(".edge_line").data(links);
             let edge_line_enter = edge_line_update.enter();
             let edge_line_exit = edge_line_update.exit();
-    
+
             /* --- 获取节点间连线上的文字（也就是节点上连线上的子） 的三个部分 update enter  exit ---用 text 构建-*/
             let edge_text_update = svg.selectAll(".text_edge").data(links);
             let edge_text_enter = edge_text_update.enter();
             let edge_text_exit = edge_text_update.exit();
-    
+
             /*---获取整个 节点组 group。这里所说的整个节点组 包括如下部分：
              * 1.内部圆          默认显示的，比较小的 实心圆 ----用circle 构建
              * 2.内部圆上的文字   顾名思义，就是显示在内部圆上的文字，可以是节点的id。name。等内容，以便节点之间能够区分开。---用text 构建
@@ -345,7 +358,7 @@ panorama.prototype = {
             let groups_update = svg.selectAll(".groupstyle").data(option.node_data);
             let groups_enter = groups_update.enter();
             let groups_exit = groups_update.exit();
-    
+
             /*——————————————————————————————————————————————————————————————*/
             /*       截至到此，svg 标签下面的初级子标签的不同部分已经获取完成，对页面显示内容的操作，都是在这些节点上的操作(确切的是增、删)
              再接下来的部分就是对这些自标签的不同部分进行操作了。                */
@@ -360,46 +373,46 @@ panorama.prototype = {
             //对于update更新来说，目前还没有任何操作的需求。所以略过
             //根据节点来添加相应的连线，其实是对 enter部分的操作。
             edge_line_enter.append("path") //根据绑定的 links 数据集，补全相应的 path 元素
-                    .attr("color", "gray")
-                    .attr("stroke", "gray") //设定 节点间连线的 颜色
-                    .attr("stroke-width", 2) // 设定 节点间连线的 宽度
-                    .attr("id", function (d, i) {  // 设定节点间连线的 id ，这个id 会被连线上的文字的属性所引用。用以设定文字样式。
-                        return "line" + i
-                    })
-                    .attr("class", "node_edge")
-                    .attr("marker-end", "url(#jiantou)"); // 连接defs中早已经配置好的箭头元素
+                .attr("color", "gray")
+                .attr("stroke", "gray") //设定 节点间连线的 颜色
+                .attr("stroke-width", 2) // 设定 节点间连线的 宽度
+                .attr("id", function (d, i) { // 设定节点间连线的 id ，这个id 会被连线上的文字的属性所引用。用以设定文字样式。
+                    return "line" + i
+                })
+                .attr("class", "node_edge")
+                .attr("marker-end", "url(#jiantou)"); // 连接defs中早已经配置好的箭头元素
             // 箭头某属性设定为:箭头大小根据 引用元素(本例即为：path) 的宽度 的变化而变化。所以，慎重调节 该元素的宽度。
             //对于多出的 连线部分，采取删除动作（此动作一般用于删除 ）
             edge_line_exit.remove();
             /*------  操作节点连线 -----结束-----------------------------*/
-    
+
             /*----操作 节点连线上的文字 -----------开始-----------------*/
             // 暂时没有更新 节点连线上 文字的需求
             // 添加节点连线上的文字
             edge_text_enter.append("text")
-                    .attr("dx", function (d) {
-                        return 100
-                    })
-                    .attr("dy", function (d) {
-                        return -8
-                    })
-                    /*以上两个 属性 为 配置edge上的文字，与节点之间的距离。
-                     * todo：文字现在的位置是写死的，距离source节点的距离是始终是100，而不会随着节点之间的连线的增长或者是缩短而动态的调节
-                     * todo：与两端节点之间的距离。需要改写成动态的。。这和下面的有一部分函数是相互作用的。
-                     * */
-                    .attr("fill", "#1685a9")
-                    .append("textPath")
-                    .attr("class", "edge_text")
-                    .attr("xlink:href", function (d, i) {
-                        return "#line" + i
-                    })
-                    .text(function (d) {
-                        return d.labels
-                    });
+                .attr("dx", function (d) {
+                    return 100
+                })
+                .attr("dy", function (d) {
+                    return -8
+                })
+                /*以上两个 属性 为 配置edge上的文字，与节点之间的距离。
+                 * todo：文字现在的位置是写死的，距离source节点的距离是始终是100，而不会随着节点之间的连线的增长或者是缩短而动态的调节
+                 * todo：与两端节点之间的距离。需要改写成动态的。。这和下面的有一部分函数是相互作用的。
+                 * */
+                .attr("fill", "#1685a9")
+                .append("textPath")
+                .attr("class", "edge_text")
+                .attr("xlink:href", function (d, i) {
+                    return "#line" + i
+                })
+                .text(function (d) {
+                    return d.labels
+                });
             // 多余的删除
             edge_text_exit.remove();
             /*----操作 节点连线上的文字 -----------结束-----------------*/
-    
+
             /* ---操作 节点组 ---开始------*/
             // 暂时没有更新节点组的需求
             //根据数据集，创建新的节点组。
@@ -407,113 +420,115 @@ panorama.prototype = {
             //多余的节点组删除
             groups_exit.remove();
             /*----操作节点组 结束-----*/
-    
+
             /*----节点组 中添加子元素----开始-------------*/
             //添加 三瓣式圆环
             let three_part_pie = groups.append("use") //  为每个节点组添加一个 use 子元素
-                    .attr("xlink:href", "#out_circle") //  指定 use 引用的内容
-                    .attr("id", function (d) {
-                        return d.index
-                    })
-                    .attr("class", function (d, i) {
-                        return "ingroup_pie_" + d.id + "   three_part_pie"
-                    })
-                    .classed("pie_display", true); //该 三瓣式 圆环 默认是不显示状态。
-    
+                .attr("xlink:href", function (d) {
+                    return '#out_circle_' + d.data.labels
+                }) //  指定 use 引用的内容
+                .attr("id", function (d) {
+                    return d.index
+                })
+                .attr("class", function (d, i) {
+                    return "ingroup_pie_" + d.id + "   three_part_pie"
+                })
+                .classed("pie_display", true); //该 三瓣式 圆环 默认是不显示状态。
+
             // 添加外部轮廓圆
             let OUTER_R = option.nodeRadius; // 外部圆 半径 长度
-            groups.append("circle").attr("class", "outer_node");//每个组中都添加一个 圆 子元素，属性是outer_node;
-    
+            groups.append("circle").attr("class", "outer_node"); //每个组中都添加一个 圆 子元素，属性是outer_node;
+
             svg.selectAll(".outer_node") // 选择所有的外部轮廓圆，对其属性设置。
-                    .data(option.node_data)
-                    .attr("r", function (d) {
-                        return OUTER_R / Math.pow(1.3, (d.data.labels - 1));
-                    })
-                    .attr("class", function (d, i) {
-                        return "outer_node" + " ingroup_out_" + d.id + "   outer_circle_nodes"
-                    })
-                    .style("stroke", "#e0f0e9")
-                    .style("stroke-width",function (d) {
-                        return OUTER_R / Math.pow(1.3, (d.data.labels - 1)) * 0.45;
-                    })
-                    .style("opacity", 0.7)
-                    .classed("pie_display", true);
-    
+                .data(option.node_data)
+                .attr("r", function (d) {
+                    return OUTER_R / Math.pow(1.3, (d.data.labels - 1));
+                })
+                .attr("class", function (d, i) {
+                    return "outer_node" + " ingroup_out_" + d.id + "   outer_circle_nodes"
+                })
+                .style("stroke", "#e0f0e9")
+                .style("stroke-width", function (d) {
+                    return OUTER_R / Math.pow(1.3, (d.data.labels - 1)) * 0.45;
+                })
+                .style("opacity", 0.7)
+                .classed("pie_display", true);
+
             // 添加内部圆
             let INNER_R = option.nodeRadius; // 内部圆 半径 长度
             groups.append("circle").attr("class", "inner_node"); //每个组再次添加一个子元素，属性是 inner_node
-    
-            svg.selectAll(".inner_node")// 选择所有的内部圆，对其属性设置。
-                    .data(option.node_data)
-                    .attr("r", function (d) {
-                        return INNER_R / Math.pow(1.3, (d.data.labels - 1));
-                    })
-                    .attr("class", function (d, i) {
-                        return "inner_node" + " ingroup_inne_" + d.id + "   inner_circle_nodes"
-                    })
-                    .attr("fill", function (d, i) {
-                        return node_color[d.data.labels]
-                    })
-                    .attr("id", function (d, i) {
-                        return d.id
-                    })
-                    .style("stroke" , '#ff461f')
-                    .call(drag)
-                    .on("mouseover", function (d, i) {  // 鼠标覆盖，显示外部轮廓圆
-                        let curr_id = ".ingroup_out_" + d.id;
-                        let out_node = svg.select(curr_id).classed("pie_display", false);
-    
-                    })
-                    .on("mouseout", function (d, i) { // 鼠标离开，隐藏外部轮廓圆
-                        let curr_id = ".ingroup_out_" + d.id;
-                        let out_node = svg.select(curr_id).classed("pie_display", true);
-                    })
-                    .on("click", function (d, i) { // 单击 清除所有的显示状态的三瓣式圆环，只显示本节点的 三瓣式 圆环
-                        console.log('添加事件');
-                        node_info = d;
-                        let pie_id = ".ingroup_pie_" + d.id;
-                        svg.selectAll("use").classed("pie_display", true);
-                        let pie_node = svg.select(pie_id).classed("pie_display", false);
-                    })
-                    .on("dblclick", function (d, i) {  // 扩展 本节点
-                        alert(d.id);
-                        /* todo: 实现扩展方法
-                         * */
-                    });
+
+            svg.selectAll(".inner_node") // 选择所有的内部圆，对其属性设置。
+                .data(option.node_data)
+                .attr("r", function (d) {
+                    return INNER_R / Math.pow(1.3, (d.data.labels - 1));
+                })
+                .attr("class", function (d, i) {
+                    return "inner_node" + " ingroup_inne_" + d.id + "   inner_circle_nodes"
+                })
+                .attr("fill", function (d, i) {
+                    return node_color[d.data.labels]
+                })
+                .attr("id", function (d, i) {
+                    return d.id
+                })
+                .style("stroke", '#ff461f')
+                .call(drag)
+                .on("mouseover", function (d, i) { // 鼠标覆盖，显示外部轮廓圆
+                    let curr_id = ".ingroup_out_" + d.id;
+                    let out_node = svg.select(curr_id).classed("pie_display", false);
+
+                })
+                .on("mouseout", function (d, i) { // 鼠标离开，隐藏外部轮廓圆
+                    let curr_id = ".ingroup_out_" + d.id;
+                    let out_node = svg.select(curr_id).classed("pie_display", true);
+                })
+                .on("click", function (d, i) { // 单击 清除所有的显示状态的三瓣式圆环，只显示本节点的 三瓣式 圆环
+                    console.log('添加事件');
+                    node_info = d;
+                    let pie_id = ".ingroup_pie_" + d.id;
+                    svg.selectAll("use").classed("pie_display", true);
+                    let pie_node = svg.select(pie_id).classed("pie_display", false);
+                })
+                .on("dblclick", function (d, i) { // 扩展 本节点
+                    alert(d.id);
+                    /* todo: 实现扩展方法
+                     * */
+                });
             // 添加 节点上的 文字
             groups.append("text").attr("class", "text_nodes"); //每个节点组添加一个 文字 子元素
-            let FONT_SIZE = 12;  // 节点文字的大小
+            let FONT_SIZE = 12; // 节点文字的大小
             svg.selectAll(".text_nodes")
-                    .data(option.node_data)
-                    .attr("class", "text_nodes")
-                    .attr("fill", "black")
-                    .text(function (d, i) {
-                        return d.data.property.name
-                    })
-                    .style("font-size", FONT_SIZE)
-                    /* 以下动作和内部圆动作一致，因为如果不给它添加这些相同的动作，当鼠标处于这些文字时，上述定义的内部圆上的动作都会失效*/
-                    .call(drag)
-                    .on("mouseover", function (d, i) {
-                        let curr_id = ".ingroup_out_" + d.id;
-                        let out_node = svg.select(curr_id).classed("pie_display", false);
-                    })
-                    .on("mouseout", function (d, i) {
-                        let curr_id = ".ingroup_out_" + d.id;
-                        let out_node = svg.select(curr_id).classed("pie_display", true);
-                    })
-                    .on("click", function (d, i) {
-                        node_info = d;
-                        let pie_id = ".ingroup_pie_" + d.id;
-                        svg.selectAll("use").classed("pie_display", true);
-                        let pie_node = svg.select(pie_id).classed("pie_display", false);
-                    })
-                    .on("dblclick", function (d, i) {
-                        alert(d.id)
-                    });
-    
+                .data(option.node_data)
+                .attr("class", "text_nodes")
+                .attr("fill", "black")
+                .text(function (d, i) {
+                    return d.data.property.name
+                })
+                .style("font-size", FONT_SIZE)
+                /* 以下动作和内部圆动作一致，因为如果不给它添加这些相同的动作，当鼠标处于这些文字时，上述定义的内部圆上的动作都会失效*/
+                .call(drag)
+                .on("mouseover", function (d, i) {
+                    let curr_id = ".ingroup_out_" + d.id;
+                    let out_node = svg.select(curr_id).classed("pie_display", false);
+                })
+                .on("mouseout", function (d, i) {
+                    let curr_id = ".ingroup_out_" + d.id;
+                    let out_node = svg.select(curr_id).classed("pie_display", true);
+                })
+                .on("click", function (d, i) {
+                    node_info = d;
+                    let pie_id = ".ingroup_pie_" + d.id;
+                    svg.selectAll("use").classed("pie_display", true);
+                    let pie_node = svg.select(pie_id).classed("pie_display", false);
+                })
+                .on("dblclick", function (d, i) {
+                    alert(d.id)
+                });
+
             /*----节点组 中添加子元素----结束-------------*/
-    
-    
+
+
         }
 
         update_view(option.node_data, option.node_links);
