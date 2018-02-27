@@ -53,13 +53,13 @@ panorama.prototype = {
                 color = option.color;
             } else {
                 color = [
-                    '#68bdf6', // light blue
-                    '#6dce9e', // green #1
-                    '#faafc2', // light pink
-                    '#f2baf6', // purple
-                    '#ff928c', // light red
-                    '#fcea7e', // light yellow
-                    '#ffc766', // light orange
+                    // '#68bdf6', // light blue
+                    // '#6dce9e', // green #1
+                    // '#faafc2', // light pink
+                    // '#f2baf6', // purple
+                    // '#ff928c', // light red
+                    // '#fcea7e', // light yellow
+                    // '#ffc766', // light orange
                     '#405f9e', // navy blue
                     '#a5abb6', // dark gray
                     '#78cecb', // green #2,
@@ -252,8 +252,15 @@ panorama.prototype = {
             /*------动态调节 节点 间连线 --- 开始 ------*/
             // 此处函数为 动态创建 节点之间的 连线，使连线，随着 节点的移动而变化
             node_edge.attr("d", function (d, i) {
-                let path = "M" + " " + d.source.x + " " + d.source.y + " " +
-                    "L" + " " + d.target.x + " " + d.target.y;
+                // let path = "M" + " " + d.source.x + " " + d.source.y + " " +
+                //     "L" + " " + d.target.x + " " + d.target.y;
+                var dx = d.target.x - d.source.x,//增量  
+                dy = d.target.y - d.source.y,  
+                dr = Math.sqrt(dx * dx + dy * dy);  
+                let path = "M" + d.source.x + ","   
+                            + d.source.y + "A" + dr + ","   
+                            + dr + " 0 0,1 " + d.target.x + ","   
+                            + d.target.y;
                 return path
             });
 
@@ -398,11 +405,12 @@ panorama.prototype = {
                 .attr("color", "gray")
                 .attr("stroke", "gray") //设定 节点间连线的 颜色
                 .attr("stroke-width", 2) // 设定 节点间连线的 宽度
+                .attr("fill", "transparent")
                 .attr("id", function (d, i) { // 设定节点间连线的 id ，这个id 会被连线上的文字的属性所引用。用以设定文字样式。
                     return "line" + i
                 })
                 .attr("class", "node_edge")
-                .attr("marker-end", "url(#jiantou)"); // 连接defs中早已经配置好的箭头元素
+                //.attr("marker-end", "url(#jiantou)"); // 连接defs中早已经配置好的箭头元素
             // 箭头某属性设定为:箭头大小根据 引用元素(本例即为：path) 的宽度 的变化而变化。所以，慎重调节 该元素的宽度。
             //对于多出的 连线部分，采取删除动作（此动作一般用于删除 ）
             edge_line_exit.remove();
