@@ -446,7 +446,7 @@ panorama.prototype = {
                     .attr("id", function (d, i) {
                         return d.id
                     })
-                    //.style("stroke" , '#ff461f')
+                    .style("stroke" , '#ff461f')
                     .call(drag)
                     .on("mouseover", function (d, i) {  // 鼠标覆盖，显示外部轮廓圆
                         let curr_id = ".ingroup_out_" + d.id;
