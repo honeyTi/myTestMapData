@@ -129,6 +129,13 @@ panorama.prototype = {
             .attr("class", function (d, i) {
                 return "action_" + i + " three_circle"
             });
+        outer.append("path")
+            .attr("d", function (d) {
+                return arc(d)
+            })
+            .attr("fill", "#bbcdc5")
+            .attr("stroke", "#f0f0f4")
+            .attr("stroke-width", 2);
         outer.append("text")
             .attr("transform", function (d, i) {
                 return "translate(" + arc.centroid(d) + ")";
