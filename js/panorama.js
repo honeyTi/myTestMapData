@@ -102,14 +102,15 @@ panorama.prototype = {
         let defs = svg.append("defs");
         let marker = defs.append("marker")
             .attr("id", "jiantou")
-            .attr("markerHeight", "10")
-            .attr("markerWidth", "10")
+            .attr("markerHeight", "7")
+            .attr("markerWidth", "7")
             .attr("markerUnits", "strokeWidth")
-            .attr("refX", "22") //修改 marker 的偏移位置
-            .attr("refY", "6") //修改 marker 的偏移位置
+            .attr("refX", "20") //修改 marker 的偏移位置
+            .attr("refY", "4") //修改 marker 的偏移位置
             .attr("orient", "auto")
-            .attr("stroke", "black");
-        let arrow_path = "M 2,2 L 10,6, L 2,10 L 6,6 L 2,2 ";
+            .attr("fill", "gray")
+            .attr("stroke", "gray");
+        let arrow_path = "M 0.5,0.5 L 7,4, L 0.5,7 L 4,4 L 0.5,0.5 ";
         marker.append("path")
             .attr("d", arrow_path);
 
@@ -354,7 +355,8 @@ panorama.prototype = {
             //对于update更新来说，目前还没有任何操作的需求。所以略过
             //根据节点来添加相应的连线，其实是对 enter部分的操作。
             edge_line_enter.append("path") //根据绑定的 links 数据集，补全相应的 path 元素
-                    .attr("stroke", "black") //设定 节点间连线的 颜色
+                    .attr("color", "gray")
+                    .attr("stroke", "gray") //设定 节点间连线的 颜色
                     .attr("stroke-width", 2) // 设定 节点间连线的 宽度
                     .attr("id", function (d, i) {  // 设定节点间连线的 id ，这个id 会被连线上的文字的属性所引用。用以设定文字样式。
                         return "line" + i
@@ -444,6 +446,7 @@ panorama.prototype = {
                     .attr("id", function (d, i) {
                         return d.id
                     })
+                    //.style("stroke" , '#ff461f')
                     .call(drag)
                     .on("mouseover", function (d, i) {  // 鼠标覆盖，显示外部轮廓圆
                         let curr_id = ".ingroup_out_" + d.id;

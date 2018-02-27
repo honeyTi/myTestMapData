@@ -29,4 +29,10 @@ opacity: .3;
     text-anchor: middle;
     font-size:  12;
 }
+.inner_node {
+    stroke: pink;
+}
+.pie_display {
+    display: none;
+}
   
