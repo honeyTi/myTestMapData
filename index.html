@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="js/d3.min.js"></script>
+    <script src="js/d3.js"></script>
+    <!-- <script src="js/d3.min.js"></script> -->
+    
     <script src="js/panorama.js"></script>
     <link rel="stylesheet" href="css/style.css">
     <style>
@@ -25,13 +27,18 @@
             color: '',
             tier: '',
             nodeRadius: 25,
+            minCollision: 60,
             data: {
                 nodes:[
                     {id: '1', tier: '1', color: '', properties:[]},
                     {id: '2', tier: '2', color: '', properties:[]},
                     {id: '3', tier: '3', color: '', properties:[]}
                 ],
-                nodeRelationships: []
+                nodeRelationships: [  
+                    { "source": 0 , "target": 1 , "relation":"挚友" },  
+                    { "source": 0 , "target": 2 , "relation":"挚友" },  
+                    { "source": 1 , "target": 2 , "relation":"挚友" }  
+                ]  
             }
         };
         panorama(data,'neo4jData');

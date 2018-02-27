@@ -19,85 +19,32 @@ panorama.prototype = {
               nodes = data.data.nodes,
               nodeRelationships = data.data.nodeRelationships;
         // 用到的变量
-        let svg, svgScale, svgTranslate, svgRelationships, svgNodes, node;
-        
-        // 页面处理，添加d3元素，增加内容
-        function appendGraph(container) {
-            console.log('创建画布元素');
-            svg = container.append('svg')
-                .attr('width', '100%')
-                .attr('height', '100%')
-                .call(d3.zoom().on('zoom', function () {
-                    var scale = d3.event.transform.k,
-                        translate = [d3.event.transform.x, d3.event.transform.y];
+        let svg, svgScale, svgTranslate, svgRelationships, svgNodes, node, layout, relationship;
 
-                    if (svgTranslate) {
-                        translate[0] += svgTranslate[0];
-                        translate[1] += svgTranslate[1];
-                    }
-
-                    if (svgScale) {
-                        scale *= svgScale;
-                    }
-
-                    svg.attr('transform', 'translate(' + translate[0] + ', ' + translate[1] + ') scale(' + scale + ')');
-                }))
-                .on('dblclick.zoom', null)
-                .append('g')
-                .attr('width', '100%')
-                .attr('height', '100%');
+        //方法的定义
+        function update_view(dataset, linkset) {
             
-            svgRelationships = svg.append('g')
-                .attr('class', 'relationships');
-
-            svgNodes = svg.append('g')
-                .attr('class', 'nodes');
-        }
-        function appendNodeToGraph() {
-            var n = appendNode();
-
-           // appendRingToNode(n);
             
-            appendOutlineToNode(n);
-
-            if (data.icons) {
-                appendTextToNode(n);
+            var links = [];
+            if (linkset.length > 0) {
+                //if (typeof(linkset[0]["source"]) == "string") {
+                    linkset.forEach(function (e) {
+                        var sourceNode = dataset.filter(function (d) {
+                            return e.source == d.id
+                        })[0];
+                        var targetNode = dataset.filter(function (d) {
+                            return e.target == d.id
+                        })[0];
+                        e.source = sourceNode;
+                        e.target = targetNode;
+                    });
+                    links =  linkset;
+                console.log(links);
             }
+        }
 
-            if (data.images) {
-                appendImageToNode(n);
-            }
-
-            return n;
-        }
-        function appendNode() {
-            return svgNodes.selectAll('g')
-                        .data(nodes)
-                        .enter()
-                        .append('g')
-                        .attr('class','node')
-                        .append('circle')
-                        .attr('fill','#e4393c')
-                        .attr('r', '20')
-                        .append('text')
-                        .text(function (d) {
-                            return d.id
-                        })
-                        .attr('dy','1em')
-        }
-        function appendOutlineToNode(){
-            return svgNodes.selectAll('.node') 
-                .append('circle')
-                .attr('class', 'ring')
-                .attr('r', function (d) {
-                    return 25;
-                })
-                .append('title').text("ring");
-        }
-        function appendTextToNode(n){}
-        function appendImageToNode(n){}
-        appendGraph(d3.select(container));
-        appendNodeToGraph();
+        // 监听每帧的变化
+        update_view(nodes, nodeRelationships);
     },
 
 // 事件方法
