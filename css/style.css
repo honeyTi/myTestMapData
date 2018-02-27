@@ -23,4 +23,10 @@ font-family: FontAwesome;
 filter: alpha(opacity=30);
 opacity: .3;
 }
+.text {
+    x: 20;
+    y: 20;
+    text-anchor: middle;
+    font-size:  12;
+}
   
