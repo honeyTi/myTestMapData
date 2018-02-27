@@ -100,27 +100,27 @@ panorama.prototype = {
 
         // 创建箭头
         let defs = svg.append("defs");
-        let marker = defs.append("marker")
-            .attr("id", "jiantou")
-            .attr("markerHeight", "7")
-            .attr("markerWidth", "7")
-            .attr("markerUnits", "strokeWidth")
-            .attr("refX", "20") //修改 marker 的偏移位置
-            .attr("refY", "4") //修改 marker 的偏移位置
-            .attr("orient", "auto")
-            .attr("fill", "gray")
-            .attr("stroke", "gray");
-        let arrow_path = "M 0.5,0.5 L 7,4, L 0.5,7 L 4,4 L 0.5,0.5 ";
-        marker.append("path")
-            .attr("d", arrow_path);
+        // let marker = defs.append("marker")
+        //     .attr("id", "jiantou")
+        //     .attr("markerHeight", "7")
+        //     .attr("markerWidth", "7")
+        //     .attr("markerUnits", "strokeWidth")
+        //     .attr("refX", "20") //修改 marker 的偏移位置
+        //     .attr("refY", "4") //修改 marker 的偏移位置
+        //     .attr("orient", "auto")
+        //     .attr("fill", "gray")
+        //     .attr("stroke", "gray");
+        // let arrow_path = "M 0.5,0.5 L 7,4, L 0.5,7 L 4,4 L 0.5,0.5 ";
+        // marker.append("path")
+        //     .attr("d", arrow_path);
 
         // 外圆轮廓---三个按钮
         let database = [1, 1, 1];
         let pie = d3.layout.pie();
         let piedata = pie(database);
         var arc = d3.svg.arc()
-            .innerRadius(30)
-            .outerRadius(60);
+            .innerRadius(option.nodeRadius)
+            .outerRadius(option.nodeRadius * 2);
         let outer = defs.append("g")
             .attr("id", 'out_circle')
             .selectAll(".group")
@@ -176,8 +176,8 @@ panorama.prototype = {
             /*---------------------- 三个动作------结束-----------------------*/
 
             let FONT_SIZE = 12; //字体大小
-            let OUTER_R = 50; //外圆半径
-            let INNER_R = 25; // 内圆半径
+            let OUTER_R = option.nodeRadius * 2; //外圆半径
+            let INNER_R = option.nodeRadius; // 内圆半径
 
             let three_part_pie = svg.selectAll(".three_part_pie");
             let node_edge = svg.selectAll(".node_edge");
