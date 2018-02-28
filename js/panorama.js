@@ -88,13 +88,13 @@ panorama.prototype = {
                 color = option.color;
             } else {
                 color = [
-                    // '#68bdf6', // light blue
-                    // '#6dce9e', // green #1
-                    // '#faafc2', // light pink
-                    // '#f2baf6', // purple
-                    // '#ff928c', // light red
-                    // '#fcea7e', // light yellow
-                    // '#ffc766', // light orange
+                    '#68bdf6', // light blue
+                    '#6dce9e', // green #1
+                    '#faafc2', // light pink
+                    '#f2baf6', // purple
+                    '#ff928c', // light red
+                    '#fcea7e', // light yellow
+                    '#ffc766', // light orange
                     '#405f9e', // navy blue
                     '#a5abb6', // dark gray
                     '#78cecb', // green #2,
