@@ -20,6 +20,41 @@ panorama.prototype = {
             node_links: data.links
         };
 
+        //圆弧线
+        let linkGroup = {};  
+        let linkmap = {}  
+        let links = option.node_links;
+        for(let i=0; i<links.length; i++){  
+            let key = links[i].source<links[i].target?links[i].source+':'+links[i].target:links[i].target+':'+links[i].source;  
+            if(!linkmap.hasOwnProperty(key)){  
+                linkmap[key] = 0;  
+            }  
+            linkmap[key]+=1;  
+            if(!linkGroup.hasOwnProperty(key)){  
+                linkGroup[key]=[];  
+            }  
+            linkGroup[key].push(links[i]);  
+        }  
+        for(let i=0; i<links.length; i++){  
+            let key = links[i].source<links[i].target?links[i].source+':'+links[i].target:links[i].target+':'+links[i].source;  
+            links[i].size = linkmap[key];  
+            let group = linkGroup[key];  
+            let keyPair = key.split(':');  
+            let type = 'noself';
+            if(keyPair[0]==keyPair[1]){  
+                type = 'self';  
+            }  
+            setLinkNumber(group,type);  
+        }  
+        console.log(links);  
+        let nodes = {};  
+        
+        // Compute the distinct nodes from the links.  
+        // links.forEach(function(link) {  
+        //     link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});  
+        //     link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});  
+        // });  
+
         let width = option.containerWH[0],
             height = option.containerWH[1];
 
@@ -222,7 +257,7 @@ panorama.prototype = {
             let edge_text = svg.selectAll(".edge_text");
             let outer_circle_nodes = svg.selectAll(".outer_circle_nodes");
             let inner_circle_nodes = svg.selectAll(".inner_circle_nodes");
-            let text_nodes = svg.selectAll(".text_nodes");
+            let text_nodes = svg.selectAll(".text_nodes"); 
 
             /*-----限定 节点组 移动 范围开始------*/
             // 所有 节点的移动边界由此 限定
@@ -252,16 +287,35 @@ panorama.prototype = {
             /*------动态调节 节点 间连线 --- 开始 ------*/
             // 此处函数为 动态创建 节点之间的 连线，使连线，随着 节点的移动而变化
             node_edge.attr("d", function (d, i) {
+                //*******************************全直线*******************************
                 // let path = "M" + " " + d.source.x + " " + d.source.y + " " +
                 //     "L" + " " + d.target.x + " " + d.target.y;
-                var dx = d.target.x - d.source.x,//增量  
-                dy = d.target.y - d.source.y,  
-                dr = Math.sqrt(dx * dx + dy * dy);  
-                let path = "M" + d.source.x + ","   
-                            + d.source.y + "A" + dr + ","   
-                            + dr + " 0 0,1 " + d.target.x + ","   
-                            + d.target.y;
-                return path
+                //*******************************全弧线*******************************
+                // let dx = d.target.x - d.source.x,//增量  
+                // dy = d.target.y - d.source.y,  
+                // dr = Math.sqrt(dx * dx + dy * dy);  
+                // let path = "M" + d.source.x + ","   
+                //             + d.source.y + "A" + dr + ","   
+                //             + dr + " 0 0,1 " + d.target.x + ","   
+                //             + d.target.y;
+                // return path
+                console.log(d.source.x);
+                if(d.target==d.source){  
+                    dr = 30/d.linknum;  
+                    return"M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 1,1 " + d.target.x + "," + (d.target.y+1);  
+                }else if(d.size%2!=0 && d.linknum==1){
+                    return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;  
+                }  
+                var curve=1.5;  
+                var homogeneous=1.2;  
+                var dx = d.target.x - d.source.x,  
+                    dy = d.target.y - d.source.y,  
+                    dr = Math.sqrt(dx*dx+dy*dy)*(d.linknum+homogeneous)/(curve*homogeneous);  
+                if(d.linknum<0){  
+                    dr = Math.sqrt(dx*dx+dy*dy)*(-1*d.linknum+homogeneous)/(curve*homogeneous);  
+                    return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,0 " + d.target.x + "," + d.target.y;  
+                }  
+                return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;  
             });
 
             /*------动态调节 节点 间连线 --- 结束 ------*/
@@ -348,6 +402,60 @@ panorama.prototype = {
 
             /*----监听事件 -- 结束  ----------------- 代码结束的位置*/
         });
+
+        function setLinkNumber(group,type){  
+            if(group.length==0) return;  
+            var linksA = [], linksB = [];  
+            for(var i = 0;i<group.length;i++){  
+                var link = group[i];  
+                if(link.source < link.target){  
+                    linksA.push(link);  
+                }else{  
+                    linksB.push(link);  
+                }  
+            }
+            var maxLinkNumber = 0;  
+            if(type=='self'){  
+                maxLinkNumber = group.length;  
+            }else{  
+                maxLinkNumber = group.length%2==0?group.length/2:(group.length+1)/2;  
+            }  
+            if(linksA.length==linksB.length){  
+                var startLinkNumber = 1;  
+                for(var i=0;i<linksA.length;i++){  
+                    linksA[i].linknum = startLinkNumber++;  
+                }  
+                startLinkNumber = 1;  
+                for(var i=0;i<linksB.length;i++){  
+                    linksB[i].linknum = startLinkNumber++;  
+                }  
+            }else{
+                var biggerLinks,smallerLinks;  
+                if(linksA.length>linksB.length){  
+                    biggerLinks = linksA;  
+                    smallerLinks = linksB;  
+                }else{  
+                    biggerLinks = linksB;  
+                    smallerLinks = linksA;  
+                }  
+      
+                var startLinkNumber = maxLinkNumber;  
+                for(var i=0;i<smallerLinks.length;i++){  
+                    smallerLinks[i].linknum = startLinkNumber--;  
+                }  
+                var tmpNumber = startLinkNumber;  
+      
+                startLinkNumber = 1;  
+                var p = 0;  
+                while(startLinkNumber<=maxLinkNumber){  
+                    biggerLinks[p++].linknum = startLinkNumber++;  
+                }  
+                startLinkNumber = 0-tmpNumber;  
+                for(var i=p;i<biggerLinks.length;i++){  
+                    biggerLinks[i].linknum = startLinkNumber++;  
+                }  
+            }   
+        }  
 
         // 构造视图函数
         let node_info = null;
